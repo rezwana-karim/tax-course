@@ -40,7 +40,9 @@
 
         <div class="course-actions">
             <a href="/courses" class="btn btn-secondary">← All Courses</a>
-            <a href="{{ route('courses.edit', $course->id) }}" class="btn btn-primary">Edit Course</a>
+            @can('update', $course)
+                <a href="{{ route('courses.edit', $course->id) }}" class="btn btn-primary">Edit Course</a>
+            @endcan
         </div>
     </div>
 
