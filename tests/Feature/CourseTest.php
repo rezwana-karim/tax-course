@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Content;
 use App\Models\Course;
 use App\Models\Module;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -13,20 +14,24 @@ class CourseTest extends TestCase
     use RefreshDatabase;
 
     /**
-     * Test course creation page loads successfully.
+     * Test course creation page loads successfully for authenticated instructor.
      */
     public function test_course_creation_page_loads(): void
     {
-        $response = $this->get('/courses/create');
+        $user = User::factory()->create(['role' => 'instructor']);
+        
+        $response = $this->actingAs($user)->get('/courses/create');
         $response->assertStatus(200);
         $response->assertSee('Create New Course');
     }
 
     /**
-     * Test course can be created via API.
+     * Test course can be created via API by authenticated instructor.
      */
     public function test_course_can_be_created(): void
     {
+        $user = User::factory()->create(['role' => 'instructor']);
+        
         $courseData = [
             'title' => 'Test Course',
             'description' => 'Test Description',
@@ -45,7 +50,7 @@ class CourseTest extends TestCase
             ],
         ];
 
-        $response = $this->postJson('/api/courses', $courseData);
+        $response = $this->actingAs($user)->postJson('/api/courses', $courseData);
 
         $response->assertStatus(201);
         $response->assertJson([
@@ -56,6 +61,7 @@ class CourseTest extends TestCase
         $this->assertDatabaseHas('courses', [
             'title' => 'Test Course',
             'description' => 'Test Description',
+            'user_id' => $user->id,
         ]);
 
         $this->assertDatabaseHas('modules', [
@@ -73,6 +79,8 @@ class CourseTest extends TestCase
      */
     public function test_course_creation_requires_title(): void
     {
+        $user = User::factory()->create(['role' => 'instructor']);
+        
         $courseData = [
             'description' => 'Test Description',
             'modules' => [
@@ -88,7 +96,7 @@ class CourseTest extends TestCase
             ],
         ];
 
-        $response = $this->postJson('/api/courses', $courseData);
+        $response = $this->actingAs($user)->postJson('/api/courses', $courseData);
 
         $response->assertStatus(422);
         $response->assertJsonValidationErrors('title');
@@ -99,13 +107,15 @@ class CourseTest extends TestCase
      */
     public function test_course_creation_requires_modules(): void
     {
+        $user = User::factory()->create(['role' => 'instructor']);
+        
         $courseData = [
             'title' => 'Test Course',
             'description' => 'Test Description',
             'modules' => [],
         ];
 
-        $response = $this->postJson('/api/courses', $courseData);
+        $response = $this->actingAs($user)->postJson('/api/courses', $courseData);
 
         $response->assertStatus(422);
         $response->assertJsonValidationErrors('modules');
@@ -116,6 +126,8 @@ class CourseTest extends TestCase
      */
     public function test_nested_content_can_be_created(): void
     {
+        $user = User::factory()->create(['role' => 'instructor']);
+        
         $courseData = [
             'title' => 'Test Course',
             'description' => 'Test Description',
@@ -141,7 +153,7 @@ class CourseTest extends TestCase
             ],
         ];
 
-        $response = $this->postJson('/api/courses', $courseData);
+        $response = $this->actingAs($user)->postJson('/api/courses', $courseData);
 
         $response->assertStatus(201);
 
@@ -172,13 +184,38 @@ class CourseTest extends TestCase
     }
 
     /**
+     * Test courses index view loads successfully.
+     */
+    public function test_courses_index_view_loads(): void
+    {
+        $response = $this->get('/courses');
+        $response->assertStatus(200);
+        $response->assertSee('All Courses');
+    }
+
+    /**
+     * Test course show view loads successfully.
+     */
+    public function test_course_show_view_loads(): void
+    {
+        $course = Course::factory()
+            ->has(Module::factory()->count(1))
+            ->create();
+
+        $response = $this->get("/courses/{$course->id}");
+        $response->assertStatus(200);
+        $response->assertSee($course->title);
+    }
+
+    /**
      * Test course can be deleted.
      */
     public function test_course_can_be_deleted(): void
     {
-        $course = Course::factory()->create();
+        $user = User::factory()->create(['role' => 'instructor']);
+        $course = Course::factory()->create(['user_id' => $user->id]);
 
-        $response = $this->deleteJson("/api/courses/{$course->id}");
+        $response = $this->actingAs($user)->deleteJson("/api/courses/{$course->id}");
 
         $response->assertStatus(200);
         $response->assertJson([

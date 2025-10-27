@@ -11,9 +11,18 @@ class Course extends Model
     use HasFactory;
 
     protected $fillable = [
+        'user_id',
         'title',
         'description',
+        'category',
+        'thumbnail',
+        'feature_video',
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(\App\Models\User::class);
+    }
 
     public function modules(): HasMany
     {

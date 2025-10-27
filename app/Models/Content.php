@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Content extends Model
 {
+    use HasFactory;
     protected $fillable = [
         'module_id',
         'parent_id',
@@ -15,6 +17,7 @@ class Content extends Model
         'body',
         'type',
         'order',
+        'file_path',
     ];
 
     public function module(): BelongsTo
