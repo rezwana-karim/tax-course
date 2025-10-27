@@ -255,7 +255,14 @@
         @yield('content')
     </div>
 
-    <script src="/js/jquery.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        if (typeof jQuery === 'undefined') {
+            var script = document.createElement('script');
+            script.src = '/js/jquery.min.js';
+            document.head.appendChild(script);
+        }
+    </script>
     @yield('scripts')
 </body>
 </html>
