@@ -243,7 +243,7 @@ class CourseController extends Controller
             if ($request->hasFile('thumbnail')) {
                 // Delete old thumbnail if exists
                 if ($course->thumbnail) {
-                    \Storage::disk('public')->delete($course->thumbnail);
+                    Storage::disk('public')->delete($course->thumbnail);
                 }
                 $updateData['thumbnail'] = $request->file('thumbnail')->store('courses/thumbnails', 'public');
             }
