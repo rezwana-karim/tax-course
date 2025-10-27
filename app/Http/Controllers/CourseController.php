@@ -43,6 +43,9 @@ class CourseController extends Controller
      */
     public function store(Request $request)
     {
+        // Check authorization
+        $this->authorize('create', Course::class);
+
         // Parse modules JSON if it's a string (from FormData)
         $modulesData = $request->modules;
         if (is_string($modulesData)) {
@@ -87,6 +90,7 @@ class CourseController extends Controller
             }
 
             $course = Course::create([
+                'user_id' => auth()->id(),
                 'title' => $request->title,
                 'description' => $request->description,
                 'thumbnail' => $thumbnailPath,
@@ -186,6 +190,8 @@ class CourseController extends Controller
     public function edit(string $id)
     {
         $course = Course::with(['modules.allContents'])->findOrFail($id);
+        
+        $this->authorize('update', $course);
 
         return view('courses.edit', compact('course'));
     }
@@ -195,6 +201,10 @@ class CourseController extends Controller
      */
     public function update(Request $request, string $id)
     {
+        $course = Course::findOrFail($id);
+        
+        $this->authorize('update', $course);
+
         $validator = Validator::make($request->all(), [
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
@@ -219,8 +229,6 @@ class CourseController extends Controller
 
         try {
             DB::beginTransaction();
-
-            $course = Course::findOrFail($id);
             
             // Handle file uploads
             $updateData = [
@@ -288,19 +296,21 @@ class CourseController extends Controller
         try {
             $course = Course::with('modules.allContents')->findOrFail($id);
             
+            $this->authorize('delete', $course);
+            
             // Delete course files
             if ($course->thumbnail) {
-                \Storage::disk('public')->delete($course->thumbnail);
+                Storage::disk('public')->delete($course->thumbnail);
             }
             if ($course->feature_video) {
-                \Storage::disk('public')->delete($course->feature_video);
+                Storage::disk('public')->delete($course->feature_video);
             }
 
             // Delete content files
             foreach ($course->modules as $module) {
                 foreach ($module->allContents as $content) {
                     if ($content->file_path) {
-                        \Storage::disk('public')->delete($content->file_path);
+                        Storage::disk('public')->delete($content->file_path);
                     }
                 }
             }

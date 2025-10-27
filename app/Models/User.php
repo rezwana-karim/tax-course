@@ -21,7 +21,40 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role',
     ];
+
+    /**
+     * Get the courses owned by the user.
+     */
+    public function courses()
+    {
+        return $this->hasMany(\App\Models\Course::class);
+    }
+
+    /**
+     * Check if the user has a specific role.
+     */
+    public function hasRole(string $role): bool
+    {
+        return $this->role === $role;
+    }
+
+    /**
+     * Check if the user is an admin.
+     */
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
+    }
+
+    /**
+     * Check if the user is an instructor.
+     */
+    public function isInstructor(): bool
+    {
+        return $this->role === 'instructor';
+    }
 
     /**
      * The attributes that should be hidden for serialization.
