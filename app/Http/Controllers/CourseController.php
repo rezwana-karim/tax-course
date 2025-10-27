@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Content;
 use App\Models\Course;
 use App\Models\Module;
-use App\Models\Content;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -17,6 +17,7 @@ class CourseController extends Controller
     public function index()
     {
         $courses = Course::with(['modules.allContents'])->get();
+
         return response()->json($courses);
     }
 
@@ -48,7 +49,7 @@ class CourseController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
@@ -78,14 +79,15 @@ class CourseController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Course created successfully',
-                'course' => $course->load(['modules.allContents'])
+                'course' => $course->load(['modules.allContents']),
             ], 201);
         } catch (\Exception $e) {
             DB::rollBack();
+
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to create course',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -119,6 +121,7 @@ class CourseController extends Controller
     public function show(string $id)
     {
         $course = Course::with(['modules.allContents.children'])->findOrFail($id);
+
         return response()->json($course);
     }
 
@@ -128,6 +131,7 @@ class CourseController extends Controller
     public function edit(string $id)
     {
         $course = Course::with(['modules.allContents'])->findOrFail($id);
+
         return view('courses.edit', compact('course'));
     }
 
@@ -151,7 +155,7 @@ class CourseController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
@@ -185,14 +189,15 @@ class CourseController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Course updated successfully',
-                'course' => $course->load(['modules.allContents'])
+                'course' => $course->load(['modules.allContents']),
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
+
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to update course',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -208,13 +213,13 @@ class CourseController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Course deleted successfully'
+                'message' => 'Course deleted successfully',
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to delete course',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
