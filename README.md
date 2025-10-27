@@ -1,61 +1,147 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Tax Course Creation Platform
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A comprehensive course creation web application built with Laravel 12 (backend) and HTML, CSS, JavaScript, jQuery (frontend). This platform enables users to create structured courses with multiple modules and nested content.
 
-## About Laravel
+## Features
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- ✅ Create courses with multiple modules
+- ✅ Add unlimited nested content to modules
+- ✅ Dynamic form handling with add/remove actions
+- ✅ Frontend and backend validation
+- ✅ RESTful API for course management
+- ✅ Responsive and modern UI
+- ✅ Database storage with proper relationships
+- ✅ Comprehensive test coverage
+- ✅ Error handling and validation
+- ✅ Performance optimized with eager loading
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Technology Stack
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- **Backend**: Laravel 12.35.1 (PHP 8.3.6)
+- **Frontend**: HTML5, CSS3, Vanilla JavaScript, jQuery 3.7.1
+- **Database**: SQLite (configurable for MySQL/PostgreSQL)
+- **Testing**: PHPUnit with Laravel's testing framework
 
-## Learning Laravel
+## Installation
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+1. Clone the repository:
+```bash
+git clone https://github.com/rezwana-karim/tax-course.git
+cd tax-course
+```
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+2. Install dependencies:
+```bash
+composer install
+npm install
+```
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+3. Configure environment:
+```bash
+cp .env.example .env
+php artisan key:generate
+```
 
-## Laravel Sponsors
+4. Run migrations:
+```bash
+php artisan migrate
+```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+5. Start the development server:
+```bash
+php artisan serve
+```
 
-### Premium Partners
+6. Access the application at `http://localhost:8000`
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+## Usage
+
+### Creating a Course
+
+1. Navigate to the course creation page
+2. Enter course title and description
+3. Add modules with titles and descriptions
+4. Add content items to each module
+5. Create nested content using the "+ Add Nested" button
+6. Submit the form to create the course
+
+### API Endpoints
+
+- `GET /api/courses` - List all courses
+- `POST /api/courses` - Create a new course
+- `GET /api/courses/{id}` - Get a specific course
+- `PUT /api/courses/{id}` - Update a course
+- `DELETE /api/courses/{id}` - Delete a course
+
+### Example API Request
+
+Create a course:
+```bash
+curl -X POST http://localhost:8000/api/courses \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "Tax Fundamentals",
+    "description": "Introduction to taxation",
+    "modules": [{
+      "title": "Module 1",
+      "description": "Getting started",
+      "contents": [{
+        "title": "What is Tax?",
+        "type": "text",
+        "body": "Tax is a mandatory financial charge...",
+        "children": [{
+          "title": "Types of Taxes",
+          "type": "text",
+          "body": "Income tax, sales tax..."
+        }]
+      }]
+    }]
+  }'
+```
+
+## Testing
+
+Run the test suite:
+```bash
+php artisan test
+```
+
+Run code formatter:
+```bash
+./vendor/bin/pint
+```
+
+## Database Structure
+
+### Courses Table
+- `id` - Primary key
+- `title` - Course title (required)
+- `description` - Course description
+- `timestamps` - Created/updated timestamps
+
+### Modules Table
+- `id` - Primary key
+- `course_id` - Foreign key to courses
+- `title` - Module title (required)
+- `description` - Module description
+- `order` - Display order
+- `timestamps` - Created/updated timestamps
+
+### Contents Table
+- `id` - Primary key
+- `module_id` - Foreign key to modules
+- `parent_id` - Foreign key to contents (for nesting)
+- `title` - Content title (required)
+- `body` - Content body
+- `type` - Content type (text, video, document, quiz)
+- `order` - Display order
+- `timestamps` - Created/updated timestamps
 
 ## Contributing
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
