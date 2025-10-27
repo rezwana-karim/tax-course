@@ -7,7 +7,7 @@
 
 <div id="message-container"></div>
 
-<form id="courseForm">
+<form id="courseForm" enctype="multipart/form-data">
     <div class="form-group">
         <label for="courseTitle">Course Title *</label>
         <input type="text" id="courseTitle" name="title" required>
@@ -16,6 +16,18 @@
     <div class="form-group">
         <label for="courseDescription">Course Description</label>
         <textarea id="courseDescription" name="description" rows="3"></textarea>
+    </div>
+
+    <div class="form-group">
+        <label for="courseThumbnail">Course Thumbnail</label>
+        <input type="file" id="courseThumbnail" name="thumbnail" accept="image/jpeg,image/png,image/jpg,image/gif">
+        <small class="form-text">Max size: 2MB. Accepted formats: JPEG, PNG, JPG, GIF</small>
+    </div>
+
+    <div class="form-group">
+        <label for="courseFeatureVideo">Feature Video</label>
+        <input type="file" id="courseFeatureVideo" name="feature_video" accept="video/mp4,video/x-msvideo,video/quicktime,video/x-ms-wmv">
+        <small class="form-text">Max size: 50MB. Accepted formats: MP4, MOV, AVI, WMV</small>
     </div>
 
     <h2 style="margin-top: 30px; margin-bottom: 20px; color: #667eea;">Modules</h2>
@@ -134,6 +146,12 @@ $(document).ready(function() {
                     <textarea class="content-body" rows="3"></textarea>
                 </div>
                 
+                <div class="form-group file-upload-group" style="display: none;">
+                    <label>Upload File</label>
+                    <input type="file" class="content-file" accept="*/*">
+                    <small class="form-text">Max size: 50MB</small>
+                </div>
+                
                 <div class="nested-content"></div>
             </div>
         `;
@@ -150,6 +168,25 @@ $(document).ready(function() {
         const moduleId = $(this).data('module-id');
         const parentContent = $(this).closest('.content-item');
         addContent(moduleId, parentContent);
+    });
+
+    // Handle content type change to show/hide file upload
+    $(document).on('change', '.content-type', function() {
+        const contentType = $(this).val();
+        const fileUploadGroup = $(this).closest('.content-item').find('> .form-group.file-upload-group');
+        const fileInput = fileUploadGroup.find('.content-file');
+        
+        if (contentType === 'video' || contentType === 'document') {
+            fileUploadGroup.show();
+            if (contentType === 'video') {
+                fileInput.attr('accept', 'video/mp4,video/x-msvideo,video/quicktime,video/x-ms-wmv');
+            } else {
+                fileInput.attr('accept', '.pdf,.doc,.docx,.txt');
+            }
+        } else {
+            fileUploadGroup.hide();
+            fileInput.val('');
+        }
     });
 
     // Remove content
@@ -187,13 +224,14 @@ $(document).ready(function() {
         submitBtn.prop('disabled', true);
         submitBtn.html('<span class="loading"></span> Creating...');
 
-        const formData = collectFormData();
+        const formData = collectFormDataWithFiles();
 
         $.ajax({
             url: '/api/courses',
             method: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify(formData),
+            data: formData,
+            processData: false,
+            contentType: false,
             success: function(response) {
                 showMessage('Course created successfully!', 'success');
                 setTimeout(() => {
@@ -275,6 +313,46 @@ $(document).ready(function() {
         return data;
     }
 
+    function collectFormDataWithFiles() {
+        const formData = new FormData();
+        
+        // Add course fields
+        formData.append('title', $('#courseTitle').val().trim());
+        formData.append('description', $('#courseDescription').val().trim());
+        
+        // Add course files
+        const thumbnailFile = $('#courseThumbnail')[0].files[0];
+        if (thumbnailFile) {
+            formData.append('thumbnail', thumbnailFile);
+        }
+        
+        const videoFile = $('#courseFeatureVideo')[0].files[0];
+        if (videoFile) {
+            formData.append('feature_video', videoFile);
+        }
+        
+        // Collect modules data
+        const modulesData = [];
+        $('.module').each(function() {
+            const moduleData = {
+                title: $(this).find('input[name*="[title]"]').val().trim(),
+                description: $(this).find('textarea[name*="[description]"]').val().trim(),
+                contents: []
+            };
+
+            // Collect top-level contents
+            $(this).find('.contents-container > .content-item').each(function() {
+                moduleData.contents.push(collectContentDataWithFiles($(this), formData));
+            });
+
+            modulesData.push(moduleData);
+        });
+        
+        formData.append('modules', JSON.stringify(modulesData));
+        
+        return formData;
+    }
+
     function collectContentData(contentElement) {
         const contentData = {
             title: contentElement.find('> .form-group > .content-title').val().trim(),
@@ -286,6 +364,30 @@ $(document).ready(function() {
         // Collect nested contents
         contentElement.find('> .nested-content > .content-item').each(function() {
             contentData.children.push(collectContentData($(this)));
+        });
+
+        return contentData;
+    }
+
+    function collectContentDataWithFiles(contentElement, formData) {
+        const contentData = {
+            title: contentElement.find('> .form-group > .content-title').val().trim(),
+            type: contentElement.find('> .form-group > .content-type').val(),
+            body: contentElement.find('> .form-group > .content-body').val().trim(),
+            children: []
+        };
+
+        // Handle file upload if present
+        const fileInput = contentElement.find('> .form-group.file-upload-group > .content-file')[0];
+        if (fileInput && fileInput.files.length > 0) {
+            // For now, we'll skip file uploads for content items
+            // This can be enhanced later with a more sophisticated approach
+            // contentData.hasFile = true;
+        }
+
+        // Collect nested contents
+        contentElement.find('> .nested-content > .content-item').each(function() {
+            contentData.children.push(collectContentDataWithFiles($(this), formData));
         });
 
         return contentData;

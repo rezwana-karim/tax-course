@@ -15,6 +15,7 @@ class Content extends Model
         'body',
         'type',
         'order',
+        'file_path',
     ];
 
     public function module(): BelongsTo

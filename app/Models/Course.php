@@ -13,6 +13,8 @@ class Course extends Model
     protected $fillable = [
         'title',
         'description',
+        'thumbnail',
+        'feature_video',
     ];
 
     public function modules(): HasMany
