@@ -6,7 +6,11 @@
 <div class="courses-list-page">
     <div class="page-header">
         <h1>All Courses</h1>
-        <a href="{{ route('courses.create') }}" class="btn btn-primary">+ Create New Course</a>
+        @auth
+            @can('create', App\Models\Course::class)
+                <a href="{{ route('courses.create') }}" class="btn btn-primary">+ Create New Course</a>
+            @endcan
+        @endauth
     </div>
 
     <div id="message-container"></div>
