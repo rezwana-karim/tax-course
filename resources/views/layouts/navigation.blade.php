@@ -19,7 +19,7 @@
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                         {{ __('Dashboard') }}
                     </x-nav-link>
-                    @if(Auth::user()->isInstructor() || Auth::user()->isAdmin())
+                    @if(Auth::user()?->isInstructor() || Auth::user()?->isAdmin())
                     <x-nav-link :href="route('courses.create')" :active="request()->routeIs('courses.create')">
                         {{ __('Create Course') }}
                     </x-nav-link>
