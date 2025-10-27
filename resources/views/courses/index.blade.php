@@ -75,8 +75,8 @@ $(document).ready(function() {
                         </div>
                         <div class="course-actions">
                             <a href="/courses/${course.id}" class="btn btn-sm btn-primary">View Course</a>
-                            <a href="/courses/${course.id}/edit" class="btn btn-sm btn-secondary">Edit</a>
-                            <button class="btn btn-sm btn-danger delete-course" data-id="${course.id}">Delete</button>
+                            ${course.can_edit ? `<a href="/courses/${course.id}/edit" class="btn btn-sm btn-secondary">Edit</a>` : ''}
+                            ${course.can_delete ? `<button class="btn btn-sm btn-danger delete-course" data-id="${course.id}">Delete</button>` : ''}
                         </div>
                     </div>
                 </div>
