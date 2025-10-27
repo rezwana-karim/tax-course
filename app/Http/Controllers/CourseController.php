@@ -108,7 +108,7 @@ class CourseController extends Controller
                 ]);
 
                 foreach ($moduleData['contents'] as $contentIndex => $contentData) {
-                    $this->createContentRecursive($module->id, $contentData, $contentIndex);
+                    $this->createContentRecursive($module->id, $contentData, $contentIndex, null, $request);
                 }
             }
 
@@ -133,18 +133,21 @@ class CourseController extends Controller
     /**
      * Helper function to create content recursively
      */
-    private function createContentRecursive($moduleId, $contentData, $order, $parentId = null)
+    private function createContentRecursive($moduleId, $contentData, $order, $parentId = null, $request = null)
     {
-        // Handle file upload for content if present
+        // Handle file upload for content if present and request is provided
         $filePath = null;
-        if (isset($contentData['file']) && $contentData['file'] instanceof \Illuminate\Http\UploadedFile) {
-            $type = $contentData['type'] ?? 'text';
-            $folder = match ($type) {
-                'video' => 'contents/videos',
-                'document' => 'contents/documents',
-                default => 'contents/files',
-            };
-            $filePath = $contentData['file']->store($folder, 'public');
+        if ($request && isset($contentData['hasFile']) && $contentData['hasFile'] && isset($contentData['fileKey'])) {
+            $fileKey = $contentData['fileKey'];
+            if ($request->hasFile($fileKey)) {
+                $type = $contentData['type'] ?? 'text';
+                $folder = match ($type) {
+                    'video' => 'contents/videos',
+                    'document' => 'contents/documents',
+                    default => 'contents/files',
+                };
+                $filePath = $request->file($fileKey)->store($folder, 'public');
+            }
         }
 
         $content = Content::create([
@@ -159,7 +162,7 @@ class CourseController extends Controller
 
         if (isset($contentData['children']) && is_array($contentData['children'])) {
             foreach ($contentData['children'] as $childIndex => $childData) {
-                $this->createContentRecursive($moduleId, $childData, $childIndex, $content->id);
+                $this->createContentRecursive($moduleId, $childData, $childIndex, $content->id, $request);
             }
         }
 

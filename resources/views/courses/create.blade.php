@@ -391,9 +391,13 @@ $(document).ready(function() {
         // Handle file upload if present
         const fileInput = contentElement.find('> .form-group.file-upload-group > .content-file')[0];
         if (fileInput && fileInput.files.length > 0) {
-            // For now, we'll skip file uploads for content items
-            // This can be enhanced later with a more sophisticated approach
-            // contentData.hasFile = true;
+            // Add file to FormData with a unique key
+            const contentPath = getContentPath(contentElement);
+            const fileKey = `content_file_${contentPath}`;
+            formData.append(fileKey, fileInput.files[0]);
+            // Mark this content as having a file
+            contentData.hasFile = true;
+            contentData.fileKey = fileKey;
         }
 
         // Collect nested contents
@@ -402,6 +406,25 @@ $(document).ready(function() {
         });
 
         return contentData;
+    }
+
+    // Helper function to get a unique path for a content item
+    function getContentPath(contentElement) {
+        const path = [];
+        let current = contentElement;
+        
+        while (current.length > 0 && current.hasClass('content-item')) {
+            const index = current.index();
+            path.unshift(index);
+            current = current.parent().closest('.content-item');
+        }
+        
+        // Also include module index
+        const moduleContainer = contentElement.closest('.contents-container');
+        const moduleIndex = $('.contents-container').index(moduleContainer);
+        path.unshift(moduleIndex);
+        
+        return path.join('_');
     }
 
     function showMessage(message, type) {
