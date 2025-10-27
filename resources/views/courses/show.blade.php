@@ -8,6 +8,12 @@
         <div class="course-header-content">
             <h1>{{ $course->title }}</h1>
             
+            @if($course->category)
+            <div class="course-category">
+                <span class="category-badge">{{ $course->category }}</span>
+            </div>
+            @endif
+            
             @if($course->thumbnail)
             <div class="course-thumbnail">
                 <img src="{{ asset('storage/' . $course->thumbnail) }}" alt="{{ $course->title }}" />

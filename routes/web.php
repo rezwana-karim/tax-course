@@ -12,15 +12,17 @@ Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
-// Web routes for courses (publicly accessible for viewing)
+// Web routes for courses
 Route::get('/courses', [CourseController::class, 'indexView'])->name('courses.index');
-Route::get('/courses/{id}', [CourseController::class, 'showView'])->name('courses.show');
 
-// Protected course routes (require authentication)
+// Protected course routes (require authentication) - must come before {id} routes
 Route::middleware('auth')->group(function () {
     Route::get('/courses/create', [CourseController::class, 'create'])->name('courses.create');
     Route::get('/courses/{id}/edit', [CourseController::class, 'edit'])->name('courses.edit');
 });
+
+// Public course view routes (parameterized routes should come after specific routes)
+Route::get('/courses/{id}', [CourseController::class, 'showView'])->name('courses.show');
 
 // API routes for AJAX operations
 Route::prefix('api')->group(function () {

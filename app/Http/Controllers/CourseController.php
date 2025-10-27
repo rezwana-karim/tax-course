@@ -56,6 +56,7 @@ class CourseController extends Controller
         $validator = Validator::make($request->all(), [
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
+            'category' => 'nullable|string|max:255',
             'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'feature_video' => 'nullable|file|mimes:mp4,mov,avi,wmv|max:51200',
             'modules' => 'required|array|min:1',
@@ -93,6 +94,7 @@ class CourseController extends Controller
                 'user_id' => auth()->id(),
                 'title' => $request->title,
                 'description' => $request->description,
+                'category' => $request->category,
                 'thumbnail' => $thumbnailPath,
                 'feature_video' => $featureVideoPath,
             ]);
@@ -208,6 +210,7 @@ class CourseController extends Controller
         $validator = Validator::make($request->all(), [
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
+            'category' => 'nullable|string|max:255',
             'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'feature_video' => 'nullable|file|mimes:mp4,mov,avi,wmv|max:51200',
             'modules' => 'required|array|min:1',
@@ -234,6 +237,7 @@ class CourseController extends Controller
             $updateData = [
                 'title' => $request->title,
                 'description' => $request->description,
+                'category' => $request->category,
             ];
 
             if ($request->hasFile('thumbnail')) {

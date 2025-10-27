@@ -19,6 +19,12 @@
     </div>
 
     <div class="form-group">
+        <label for="courseCategory">Category</label>
+        <input type="text" id="courseCategory" name="category" placeholder="e.g., Tax, Finance, Technology">
+        <small class="form-text">Enter the course category (e.g., Tax, Finance, Technology)</small>
+    </div>
+
+    <div class="form-group">
         <label for="courseThumbnail">Course Thumbnail</label>
         <input type="file" id="courseThumbnail" name="thumbnail" accept="image/jpeg,image/png,image/jpg,image/gif">
         <small class="form-text">Max size: 2MB. Accepted formats: JPEG, PNG, JPG, GIF</small>
@@ -323,6 +329,7 @@ $(document).ready(function() {
         // Add course fields
         formData.append('title', $('#courseTitle').val().trim());
         formData.append('description', $('#courseDescription').val().trim());
+        formData.append('category', $('#courseCategory').val().trim());
         
         // Add course files
         const thumbnailFile = $('#courseThumbnail')[0].files[0];
