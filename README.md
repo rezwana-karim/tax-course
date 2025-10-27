@@ -137,9 +137,55 @@ Run code formatter:
 - `order` - Display order
 - `timestamps` - Created/updated timestamps
 
+## Documentation
+
+- **[TASK.md](TASK.md)** - Original project requirements
+- **[IMPLEMENTATION_STATUS.md](IMPLEMENTATION_STATUS.md)** - Detailed implementation status and task list
+- **[DEPLOYMENT_PLAN.md](DEPLOYMENT_PLAN.md)** - Comprehensive deployment guide for various platforms
+- **[IMPLEMENTATION_SUMMARY.md](IMPLEMENTATION_SUMMARY.md)** - Technical implementation details
+- **[.github/copilot-instructions.md](.github/copilot-instructions.md)** - GitHub Copilot instructions for the project
+
+## GitHub Copilot Instructions
+
+This project includes comprehensive GitHub Copilot instructions to help with development:
+
+- **General Instructions**: See `.github/copilot-instructions.md` for project-wide guidelines
+- **GitHub Actions**: Path-specific instructions in `.github/instructions/actions.instructions.md`
+- **Accessibility**: WCAG guidelines for Blade templates in `.github/instructions/accessibility.instructions.md`
+- **Testing**: PHP/Laravel testing guidelines in `.github/instructions/tests.instructions.md`
+
+## Deployment
+
+This Laravel application **cannot be deployed on GitHub Pages** (static sites only). See [DEPLOYMENT_PLAN.md](DEPLOYMENT_PLAN.md) for:
+
+- ⭐ **Recommended**: Railway.app (Free tier with $5/month credit)
+- Alternative platforms: Render.com, Heroku, DigitalOcean
+- Step-by-step deployment guides
+- Configuration examples
+- Cost comparisons
+
+Quick start deployment on Railway.app:
+```bash
+# Files already included in repository:
+# - Procfile
+# - nixpacks.toml
+
+# 1. Create account at railway.app
+# 2. Connect GitHub repository
+# 3. Add PostgreSQL database
+# 4. Configure environment variables
+# 5. Deploy automatically
+```
+
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
+
+When contributing, please refer to:
+- `.github/copilot-instructions.md` for coding standards
+- Path-specific instructions in `.github/instructions/`
+- Run tests before submitting: `php artisan test`
+- Format code with: `./vendor/bin/pint`
 
 ## License
 
