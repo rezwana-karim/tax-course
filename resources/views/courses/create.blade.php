@@ -233,9 +233,13 @@ $(document).ready(function() {
             processData: false,
             contentType: false,
             success: function(response) {
-                showMessage('Course created successfully!', 'success');
+                showMessage('Course created successfully! Redirecting...', 'success');
                 setTimeout(() => {
-                    location.reload();
+                    if (response.course && response.course.id) {
+                        window.location.href = '/courses/' + response.course.id;
+                    } else {
+                        window.location.href = '/courses';
+                    }
                 }, 1500);
             },
             error: function(xhr) {

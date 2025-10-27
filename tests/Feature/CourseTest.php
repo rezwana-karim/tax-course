@@ -172,6 +172,30 @@ class CourseTest extends TestCase
     }
 
     /**
+     * Test courses index view loads successfully.
+     */
+    public function test_courses_index_view_loads(): void
+    {
+        $response = $this->get('/courses');
+        $response->assertStatus(200);
+        $response->assertSee('All Courses');
+    }
+
+    /**
+     * Test course show view loads successfully.
+     */
+    public function test_course_show_view_loads(): void
+    {
+        $course = Course::factory()
+            ->has(Module::factory()->count(1))
+            ->create();
+
+        $response = $this->get("/courses/{$course->id}");
+        $response->assertStatus(200);
+        $response->assertSee($course->title);
+    }
+
+    /**
      * Test course can be deleted.
      */
     public function test_course_can_be_deleted(): void

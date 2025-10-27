@@ -23,6 +23,14 @@ class CourseController extends Controller
     }
 
     /**
+     * Show the courses index view
+     */
+    public function indexView()
+    {
+        return view('courses.index');
+    }
+
+    /**
      * Show the form for creating a new resource.
      */
     public function create()
@@ -160,6 +168,16 @@ class CourseController extends Controller
         $course = Course::with(['modules.allContents.children'])->findOrFail($id);
 
         return response()->json($course);
+    }
+
+    /**
+     * Show the view for displaying a course
+     */
+    public function showView(string $id)
+    {
+        $course = Course::with(['modules.contents.children'])->findOrFail($id);
+
+        return view('courses.show', compact('course'));
     }
 
     /**
